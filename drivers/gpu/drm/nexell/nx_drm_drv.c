@@ -249,7 +249,7 @@ static struct drm_driver nx_drm_driver = {
 
 static int nx_drm_bind(struct device *dev)
 {
-	return 0;//drm_platform_init(&nx_drm_driver, to_platform_device(dev));
+	return drm_platform_init(&nx_drm_driver, to_platform_device(dev));
 }
 
 static void nx_drm_unbind(struct device *dev)
