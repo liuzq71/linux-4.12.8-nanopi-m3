@@ -1,4 +1,4 @@
-The source codes of S5P6818 drivers are all copied from https://github.com/rafaello7/linux-nanopi-m3.It is able to run but there are bugs inside.  
+The source codes of S5P6818 drivers are all copied from https://github.com/rafaello7/linux-nanopi-m3.It is able to run but has bugs.  
 ================================================
 
 Linux kernel
