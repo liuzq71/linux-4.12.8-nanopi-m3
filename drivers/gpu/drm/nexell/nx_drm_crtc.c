@@ -200,6 +200,7 @@ static int nx_drm_crtc_mode_set_base(struct drm_crtc *crtc, int x, int y,
 
 static void nx_drm_crtc_disable(struct drm_crtc *crtc)
 {
+	struct drm_modeset_acquire_ctx *ctx=NULL;
 	struct drm_plane *plane;
 	int ret;
 
@@ -210,7 +211,7 @@ static void nx_drm_crtc_disable(struct drm_crtc *crtc)
 	drm_for_each_plane(plane, crtc->dev) {
 		if (plane->crtc != crtc)
 			continue;
-		ret = plane->funcs->disable_plane(plane);
+		ret = plane->funcs->disable_plane(plane,ctx);
 		if (ret)
 			DRM_ERROR("fail : disable plane %d\n", ret);
 	}
@@ -229,7 +230,8 @@ static struct drm_crtc_helper_funcs nx_crtc_helper_funcs = {
 static int nx_drm_crtc_page_flip(struct drm_crtc *crtc,
 			struct drm_framebuffer *fb,
 			struct drm_pending_vblank_event *event,
-			uint32_t flags)
+			uint32_t flags,
+			struct drm_modeset_acquire_ctx *ctx)
 {
 	struct drm_device *drm = crtc->dev;
 	struct nx_drm_crtc *nx_crtc = to_nx_crtc(crtc);
@@ -430,7 +432,7 @@ static int nx_drm_crtc_irq_install(struct drm_device *drm,
 static int __of_graph_get_port_num_index(struct drm_device *drm,
 			int *pipe, int pipe_size)
 {
-	struct device *dev = &drm->platformdev->dev;
+	struct device *dev = drm->dev;//struct device *dev = &drm->platformdev->dev;
 	struct device_node *parent = dev->of_node;
 	struct device_node *node, *port;
 	int num = 0;
@@ -468,7 +470,7 @@ static int nx_drm_crtc_parse_dt_setup(struct drm_device *drm,
 			struct drm_crtc *crtc, int pipe)
 {
 	struct device_node *np;
-	struct device *dev = &drm->platformdev->dev;
+	struct device *dev = drm->dev;//struct device *dev = &drm->platformdev->dev;
 	struct device_node *node = dev->of_node;
 	struct nx_drm_crtc *nx_crtc = to_nx_crtc(crtc);
 	struct dp_plane_top *top = &nx_crtc->top;
@@ -481,8 +483,10 @@ static int nx_drm_crtc_parse_dt_setup(struct drm_device *drm,
 	/*
 	 * parse base address
 	 */
-	err = nx_drm_dp_crtc_res_parse(drm->platformdev, pipe, &irq,
+	err = nx_drm_dp_crtc_res_parse(to_platform_device(dev), pipe, &irq,
 				nx_crtc->resets, &nx_crtc->num_resets);
+	/*err = nx_drm_dp_crtc_res_parse(drm->platformdev, pipe, &irq,
+				nx_crtc->resets, &nx_crtc->num_resets);*/
 	if (0 > err)
 		return -EINVAL;
 

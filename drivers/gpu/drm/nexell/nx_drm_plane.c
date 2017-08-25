@@ -62,7 +62,8 @@ static int nx_drm_update_plane(struct drm_plane *plane, struct drm_crtc *crtc,
 			struct drm_framebuffer *fb, int crtc_x,
 			int crtc_y, unsigned int crtc_w,
 			unsigned int crtc_h, uint32_t src_x,
-			uint32_t src_y, uint32_t src_w, uint32_t src_h)
+			uint32_t src_y, uint32_t src_w, uint32_t src_h,
+			struct drm_modeset_acquire_ctx *ctx)
 {
 	struct nx_drm_plane *nx_plane = to_nx_plane(plane);
 	int ret;
@@ -80,7 +81,7 @@ static int nx_drm_update_plane(struct drm_plane *plane, struct drm_crtc *crtc,
 	return ret;
 }
 
-static int nx_drm_plane_disable(struct drm_plane *plane)
+static int nx_drm_plane_disable(struct drm_plane *plane,struct drm_modeset_acquire_ctx *ctx)
 {
 	struct nx_drm_plane *nx_plane = to_nx_plane(plane);
 
@@ -95,11 +96,12 @@ static int nx_drm_plane_disable(struct drm_plane *plane)
 
 static void nx_drm_plane_destroy(struct drm_plane *plane)
 {
+	struct drm_modeset_acquire_ctx *ctx=NULL; 
 	struct nx_drm_plane *nx_plane = to_nx_plane(plane);
 
 	DRM_DEBUG_KMS("enter\n");
 
-	nx_drm_plane_disable(plane);
+	nx_drm_plane_disable(plane,ctx);
 	drm_plane_cleanup(plane);
 	kfree(nx_plane);
 }
